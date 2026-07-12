@@ -33,7 +33,8 @@ async function postQuery(userInput: string, userType: UserType): Promise<QueryAp
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ user_input: userInput, user_type: USER_TYPE_KO[userType] }),
-    signal: AbortSignal.timeout(20000), // LLM 호출 포함이라 단순 API보다 여유 있게
+    // Render 무료 플랜은 유휴 상태에서 깨어나는 데 50초 이상 걸릴 수 있어 여유 있게 설정
+    signal: AbortSignal.timeout(60000),
   });
   if (!res.ok) throw new Error(`/query API error: ${res.status}`);
   return res.json();
