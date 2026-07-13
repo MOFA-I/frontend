@@ -1,10 +1,13 @@
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 interface Props {
-  data: { year: number; amount_million_usd: number }[];
+  years: number[];
+  values: number[];
 }
 
-export default function OdaTrendChart({ data }: Props) {
+export default function OdaTrendChart({ years, values }: Props) {
+  const data = years.map((year, i) => ({ year, amount_million_usd: values[i] }));
+
   return (
     <div className="h-48 w-full">
       <ResponsiveContainer width="100%" height="100%">

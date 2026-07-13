@@ -1,5 +1,7 @@
 interface Props {
   score: number; // 0-100
+  color?: string | null;
+  sub?: string | null;
 }
 
 function riskColor(score: number) {
@@ -16,12 +18,12 @@ function riskLabel(score: number) {
   return "높음";
 }
 
-export default function RiskGauge({ score }: Props) {
+export default function RiskGauge({ score, color: colorProp, sub }: Props) {
   const clamped = Math.max(0, Math.min(100, score));
   const radius = 70;
   const circumference = Math.PI * radius; // half circle
   const offset = circumference * (1 - clamped / 100);
-  const color = riskColor(clamped);
+  const color = colorProp ?? riskColor(clamped);
 
   return (
     <div className="flex flex-col items-center">
@@ -53,6 +55,7 @@ export default function RiskGauge({ score }: Props) {
           진출 리스크 {riskLabel(clamped)}
         </span>
       </div>
+      {sub && <p className="text-xs text-navy-700/50 mt-1">{sub}</p>}
     </div>
   );
 }

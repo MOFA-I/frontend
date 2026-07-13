@@ -1,5 +1,5 @@
-import type { QueryResult, UserType } from "../types";
-import { buildMockChatAnswer, getMockAgent1, getMockAgent34 } from "./mock";
+import type { Agent4Output, QueryResult, UserType } from "../types";
+import { buildMockChatAnswer, getMockAgent1, getMockReport } from "./mock";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
@@ -20,8 +20,7 @@ interface QueryApiChat {
 interface QueryApiReport {
   type: "report";
   country: string;
-  briefing: string;
-  agent1_data: import("../types").Agent1Response;
+  report: Agent4Output;
 }
 
 interface QueryApiError {
@@ -42,7 +41,7 @@ async function postQuery(userInput: string, userType: UserType): Promise<QueryAp
 
 /**
  * 일반 사용자: Agent 1 + LLM 챗봇 답변 (Agent 2~4 미사용)
- * 기업·연구자: Agent 1~4 전체 파이프라인 → 보고서 (Agent 2~4는 아직 구현 전이라 정량 지표는 목업으로 보강)
+ * 기업·연구자: Agent 1~4 전체 파이프라인 → 보고서 (report 객체를 그대로 전달)
  * 백엔드 연결 실패 시 전체를 목업으로 대체해 오프라인 개발이 가능하게 한다.
  */
 export async function fetchResult(userType: UserType, question: string, fallbackCountry: string): Promise<QueryResult> {
@@ -58,17 +57,14 @@ export async function fetchResult(userType: UserType, question: string, fallback
     return {
       type: "report",
       country: raw.country,
-      agent1: raw.agent1_data,
-      // summary_text는 실제 Agent 1 데이터 기반 LLM 브리핑(진짜), 나머지 정량 지표는 Agent 2~4 미구현으로 목업
-      agent34: { ...getMockAgent34(raw.country), summary_text: raw.briefing },
-      isAgent1Mocked: false,
-      isReportMocked: true,
+      report: raw.report,
+      isReportMocked: false,
     };
   } catch {
     const country = fallbackCountry;
-    const agent1 = getMockAgent1(country);
 
     if (userType === "individual") {
+      const agent1 = getMockAgent1(country);
       return {
         type: "chat",
         country,
@@ -81,9 +77,7 @@ export async function fetchResult(userType: UserType, question: string, fallback
     return {
       type: "report",
       country,
-      agent1,
-      agent34: getMockAgent34(country),
-      isAgent1Mocked: true,
+      report: getMockReport(country, USER_TYPE_KO[userType] as "기업" | "연구자"),
       isReportMocked: true,
     };
   }
