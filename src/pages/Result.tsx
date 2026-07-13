@@ -143,10 +143,9 @@ export default function Result() {
           </div>
 
           <div className="space-y-5">
-            <CountryMapPlaceholder country={country} isoCode={isoCode} />
-
             {result.type === "report" && (
               <>
+                <CountryMapPlaceholder country={country} isoCode={isoCode} />
                 <Section icon={Gauge} title="진출 리스크 스코어">
                   <RiskGauge score={result.agent34.risk_score} />
                 </Section>
