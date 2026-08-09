@@ -23,11 +23,17 @@ interface QueryApiReport {
   report: Agent4Output;
 }
 
+interface QueryApiRefused {
+  type: "refused";
+  reason: string | null;
+  message: string;
+}
+
 interface QueryApiError {
   error: string;
 }
 
-async function postQuery(userInput: string, userType: UserType): Promise<QueryApiChat | QueryApiReport | QueryApiError> {
+async function postQuery(userInput: string, userType: UserType): Promise<QueryApiChat | QueryApiReport | QueryApiRefused | QueryApiError> {
   const res = await fetch(`${API_BASE_URL}/query`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -49,6 +55,10 @@ export async function fetchResult(userType: UserType, question: string, fallback
     const raw = await postQuery(question, userType);
 
     if ("error" in raw) throw new Error(raw.error);
+
+    if (raw.type === "refused") {
+      return { type: "refused", country: fallbackCountry, message: raw.message };
+    }
 
     if (raw.type === "chat") {
       return { type: "chat", country: raw.country, answer: raw.answer, agent1: raw.data, isAgent1Mocked: false };

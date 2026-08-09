@@ -121,7 +121,14 @@ export interface ReportQueryResult {
   isReportMocked: boolean;
 }
 
-export type QueryResult = ChatQueryResult | ReportQueryResult;
+/** 가드레일에 의해 답변이 거절된 경우 */
+export interface RefusedQueryResult {
+  type: "refused";
+  country: string;
+  message: string;
+}
+
+export type QueryResult = ChatQueryResult | ReportQueryResult | RefusedQueryResult;
 
 export interface OnboardingRequest {
   userType: UserType;

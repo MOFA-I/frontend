@@ -66,6 +66,24 @@ export default function Result() {
   const { userType, question, result } = state;
   const { country } = result;
 
+  if (result.type === "refused") {
+    return (
+      <div className="min-h-screen bg-navy-50 flex flex-col">
+        <Header />
+        <div className="mx-auto w-full max-w-2xl px-6 py-20 flex-1 text-center">
+          <p className="text-navy-950 text-lg font-semibold mb-2">답변드릴 수 없는 질문이에요</p>
+          <p className="text-navy-700/60 text-sm mb-8">{result.message}</p>
+          <button
+            onClick={() => navigate("/")}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-navy-700 hover:text-navy-950 transition"
+          >
+            <ArrowLeft size={14} /> 새로운 질문하기
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const reportTravelLevel =
     result.type === "report"
       ? (() => {
